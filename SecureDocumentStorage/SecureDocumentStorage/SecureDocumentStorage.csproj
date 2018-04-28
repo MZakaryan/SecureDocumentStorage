@@ -5,6 +5,11 @@
     <UserSecretsId>aspnet-SecureDocumentStorage-55B9A2FD-9FEA-4993-9089-D6128A2503A9</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20180428183752_AddDocuments.cs" />
+    <Compile Remove="Data\Migrations\20180428183752_AddDocuments.Designer.cs" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />

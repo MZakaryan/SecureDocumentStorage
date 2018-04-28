@@ -49,7 +49,6 @@ artifacts/
 **/Properties/launchSettings.json
 appsettings.json
 
-*.json
 *_i.c
 *_p.c
 *_i.h

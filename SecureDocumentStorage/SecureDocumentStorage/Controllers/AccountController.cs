@@ -247,7 +247,8 @@ namespace SecureDocumentStorage.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            //TODO
+            return RedirectToAction(nameof(DocumentController.Index), "Document");
         }
 
         [HttpPost]
@@ -335,7 +336,8 @@ namespace SecureDocumentStorage.Controllers
         {
             if (userId == null || code == null)
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                //TODO
+                return RedirectToAction(nameof(DocumentController.Index), "Document");
             }
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
@@ -455,7 +457,8 @@ namespace SecureDocumentStorage.Controllers
             }
             else
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                //TODO 
+                return RedirectToAction(nameof(DocumentController.Index), "Document");
             }
         }
 
