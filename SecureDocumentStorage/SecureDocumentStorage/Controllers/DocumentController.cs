@@ -92,8 +92,6 @@ namespace SecureDocumentStorage.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadDocument(AddEditDocumentViewModel model)
         {
-            model.FileName = "Test";
-            model.EncryptedDocument = "apple";
             if (string.IsNullOrEmpty(model.EncryptedDocument))
             {
                 throw new Exception("boom");
@@ -120,7 +118,7 @@ namespace SecureDocumentStorage.Controllers
 
             string documentPath = Path.Combine(path, documentName);
 
-            using (var stream = new FileStream(documentPath, FileMode.Create))
+            using (var stream = new FileStream(documentPath, FileMode.Create)) { }
 
             using (StreamWriter writer = new StreamWriter(documentPath))
             {

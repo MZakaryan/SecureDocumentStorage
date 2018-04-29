@@ -33,3 +33,23 @@
         display: none;
     }
 }
+
+#aesKey {
+color: red;
+font-size: 20px;
+}
+
+#ispublic {
+    display: inline-block;
+    position: relative;
+    left: 113px;
+}
+
+    #ispublic label {
+        position: relative;
+        right: 10px;
+    }
+    #ispublic input {
+        position: relative;
+        top: 4px;
+    }

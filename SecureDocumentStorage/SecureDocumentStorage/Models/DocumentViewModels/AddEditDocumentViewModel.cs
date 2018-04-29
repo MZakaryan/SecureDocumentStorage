@@ -9,6 +9,6 @@ namespace SecureDocumentStorage.Models.DocumentViewModels
         public string EncryptedDocument { get; set; }
         public bool IsPublic { get; set; }
         [Required]
-        public string FileName { get; internal set; }
+        public string FileName { get; set; }
     }
 }

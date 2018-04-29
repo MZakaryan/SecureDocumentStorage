@@ -75,7 +75,15 @@
         $button.html('Done');
     }
 
+    var submitAesKey = function () {
+        if ($("#aesKey").val() != "") {
+            $("#keyFrame").hide();
+            $("#uploadDocument").show();
+        }
+    }
+
     return {
-        init: init
+        init: init,
+        submitAesKey: submitAesKey
     }
 }();

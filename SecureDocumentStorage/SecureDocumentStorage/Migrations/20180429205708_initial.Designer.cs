@@ -11,8 +11,8 @@ using System;
 namespace SecureDocumentStorage.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180429203233_Initial")]
-    partial class Initial
+    [Migration("20180429205708_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
