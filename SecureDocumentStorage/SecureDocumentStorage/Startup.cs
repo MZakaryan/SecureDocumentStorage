@@ -61,7 +61,7 @@ namespace SecureDocumentStorage
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Document}/{action=Index}/{id?}");
+                    template: "{controller=Document}/{action=PublicDocuments}/{id?}");
             });
         }
     }

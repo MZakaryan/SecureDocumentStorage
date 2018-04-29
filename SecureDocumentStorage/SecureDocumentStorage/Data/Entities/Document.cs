@@ -15,10 +15,7 @@ namespace SecureDocumentStorage.Data.Entities
 
         [Required]
         public string Name { get; set; }
-
-        [Required]
-        public string ContentType { get; set; }
-
+        
         [Required]
         public DateTime Date { get; set; }
 

@@ -19,36 +19,27 @@ namespace SecureDocumentStorage.Controllers
     public class DocumentController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signingManager;
         private readonly ApplicationDbContext _dbContext;
         private readonly IHostingEnvironment _appEnvironment;
 
         public DocumentController(UserManager<ApplicationUser> userManager,
             ApplicationDbContext dbContext,
-            IHostingEnvironment appEnvironment,
-            SignInManager<ApplicationUser> signInManager)
+            IHostingEnvironment appEnvironment)
         {
             _userManager = userManager;
             _dbContext = dbContext;
             _appEnvironment = appEnvironment;
-            _signingManager = signInManager;
         }
         
+        [Authorize]
         public async Task<IActionResult> Index()
         {
+            ApplicationUser currentUser =
+                await _userManager.GetUserAsync(HttpContext.User);
             var docs = _dbContext.Documents
                                  .Include(d => d.User)
-                                 .Where(d => d.Deleted == false);
-            if (!_signingManager.IsSignedIn(User))
-            {
-                docs = docs.Where(d => d.IsPublic == true);
-            }
-            else
-            {
-                ApplicationUser currentUser =
-                await _userManager.GetUserAsync(HttpContext.User);
-                docs = docs.Where(d => d.UserId == currentUser.Id);
-            }
+                                 .Where(d => d.Deleted == false)
+                                 .Where(d => d.UserId == currentUser.Id);
             List<DocumentInfoViewModel> model =
                 new List<DocumentInfoViewModel>();
 
@@ -67,6 +58,30 @@ namespace SecureDocumentStorage.Controllers
             return View(model);
         }
 
+        public IActionResult PublicDocuments()
+        {
+            var docs = _dbContext.Documents
+                                 .Include(d => d.User)
+                                 .Where(d => d.Deleted == false)
+                                 .Where(d => d.IsPublic == true);
+
+            List<DocumentInfoViewModel> model =
+                new List<DocumentInfoViewModel>();
+
+            foreach (Document item in docs)
+            {
+                model.Add(new DocumentInfoViewModel()
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    UserName = item.User.UserName,
+                    Date = item.Date,
+                });
+            }
+
+            return View(model);
+        }
+
         [Authorize]
         public IActionResult Upload()
         {
@@ -77,13 +92,16 @@ namespace SecureDocumentStorage.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadDocument(AddEditDocumentViewModel model)
         {
-            if (model.Document == null || model.Document.Length == 0)
+            model.FileName = "Test";
+            model.EncryptedDocument = "apple";
+            if (string.IsNullOrEmpty(model.EncryptedDocument))
             {
                 throw new Exception("boom");
             }
 
             string documentName = "document_" +
-                                  Guid.NewGuid();
+                                  Guid.NewGuid() + 
+                                  ".txt";
 
             ApplicationUser currentUser =
                 await _userManager.GetUserAsync(HttpContext.User);
@@ -103,15 +121,16 @@ namespace SecureDocumentStorage.Controllers
             string documentPath = Path.Combine(path, documentName);
 
             using (var stream = new FileStream(documentPath, FileMode.Create))
+
+            using (StreamWriter writer = new StreamWriter(documentPath))
             {
-                await model.Document.CopyToAsync(stream);
+                await writer.WriteAsync(model.EncryptedDocument);
             }
 
             Document document = new Document()
             {
                 Date = DateTime.Now,
-                Name = model.Document.FileName,
-                ContentType = model.Document.ContentType,
+                Name = model.FileName,
                 Path = documentName,
                 UserId = currentUser.Id,
                 IsPublic = model.IsPublic,
@@ -123,36 +142,36 @@ namespace SecureDocumentStorage.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Download(int id)
-        {
-            var doc = await _dbContext.Documents
-                                      .Include(d => d.User)
-                                      .Where(d => d.Id == id)
-                                      .SingleAsync();
+        //public async Task<IActionResult> Download(int id)
+        //{
+        //    var doc = await _dbContext.Documents
+        //                              .Include(d => d.User)
+        //                              .Where(d => d.Id == id)
+        //                              .SingleAsync();
 
-            var path = Path.Combine(
-                           _appEnvironment.WebRootPath,
-                           "files",
-                           "documents",
-                           doc.User.UserName + "_" +
-                           doc.UserId);
+        //    var path = Path.Combine(
+        //                   _appEnvironment.WebRootPath,
+        //                   "files",
+        //                   "documents",
+        //                   doc.User.UserName + "_" +
+        //                   doc.UserId);
             
-            return DownloadFile(path, 
-                                doc.Path, 
-                                doc.Name, 
-                                doc.ContentType);
-        }
+        //    return DownloadFile(path, 
+        //                        doc.Path, 
+        //                        doc.Name, 
+        //                        doc.ContentType);
+        //}
 
-        private FileResult DownloadFile(string folderPath, 
-                                        string filePath, 
-                                        string fileName,
-                                        string contentType)
-        {
-            IFileProvider provider = new PhysicalFileProvider(folderPath);
-            IFileInfo fileInfo = provider.GetFileInfo(filePath);
-            var readStream = fileInfo.CreateReadStream();
-            return File(readStream, contentType, fileName);
-        }
+        //private FileResult DownloadFile(string folderPath, 
+        //                                string filePath, 
+        //                                string fileName,
+        //                                string contentType)
+        //{
+        //    IFileProvider provider = new PhysicalFileProvider(folderPath);
+        //    IFileInfo fileInfo = provider.GetFileInfo(filePath);
+        //    var readStream = fileInfo.CreateReadStream();
+        //    return File(readStream, contentType, fileName);
+        //}
 
         [Authorize]
         public async Task<IActionResult> Delete(int id)

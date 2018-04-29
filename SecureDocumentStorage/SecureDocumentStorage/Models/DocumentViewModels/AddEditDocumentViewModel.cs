@@ -6,8 +6,9 @@ namespace SecureDocumentStorage.Models.DocumentViewModels
     public class AddEditDocumentViewModel
     {
         [Required]
-        public IFormFile Document { get; set; }
-        
+        public string EncryptedDocument { get; set; }
         public bool IsPublic { get; set; }
+        [Required]
+        public string FileName { get; internal set; }
     }
 }
