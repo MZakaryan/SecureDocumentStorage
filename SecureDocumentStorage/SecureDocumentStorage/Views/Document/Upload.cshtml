@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Upload";
 }
 <script src="~/lib/jquery/dist/jquery.js"></script>
@@ -11,20 +10,21 @@
         uploadManager.init();
     });
 </script>
-
-<div class="frame">
-    <div class="center">
-        <div class="bar"></div>
-        <div class="title">Drop file to upload</div>
-        <div class="dropzone">
-            <div class="content">
-                <img src="http://100dayscss.com/codepen/upload.svg" class="upload">
-                <span class="filename"></span>
-                <input type="file" class="input">
+<form id="upload-form" method="post" enctype="multipart/form-data" asp-controller="Document" asp-action="UploadDocument">
+    <div class="frame">
+        <div class="center">
+            <div class="bar"></div>
+            <div class="title">Drop file to upload</div>
+            <div class="dropzone">
+                <div class="content">
+                    <img src="http://100dayscss.com/codepen/upload.svg" class="upload">
+                    <span class="filename"></span>
+                    <input type="file" class="input" id="upload-document" name="document">
+                </div>
             </div>
+            <img src="http://100dayscss.com/codepen/syncing.svg" class="syncing">
+            <img src="http://100dayscss.com/codepen/checkmark.svg" class="done">
+            <div class="upload-btn">Upload file</div>
         </div>
-        <img src="http://100dayscss.com/codepen/syncing.svg" class="syncing">
-        <img src="http://100dayscss.com/codepen/checkmark.svg" class="done">
-        <div class="upload-btn">Upload file</div>
     </div>
-</div>
+</form>

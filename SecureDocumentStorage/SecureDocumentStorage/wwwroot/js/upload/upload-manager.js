@@ -8,6 +8,7 @@
     var $done;
     var $bar;
     var timeOut;
+    var $input;
 
 
     //Initialisation 
@@ -20,7 +21,7 @@
         $syncing = $('.syncing');
         $done = $('.done');
         $bar = $('.bar');
-
+        $input = $("#upload-document");
 
         loadEvents();
     }
@@ -40,6 +41,7 @@
             })
             .on('drop', function (e) {
                 droppedFiles = e.originalEvent.dataTransfer.files;
+                $input[0].files = droppedFiles;
                 fileName = droppedFiles[0]['name'];
                 $('.filename').html(fileName);
                 $('.dropzone .upload').hide();
@@ -65,7 +67,7 @@
             $syncing.addClass('active');
             $done.addClass('active');
             $bar.addClass('active');
-            timeoutID = window.setTimeout(showDone, 3200);
+            $("#upload-form").submit();
         }
     }
 
