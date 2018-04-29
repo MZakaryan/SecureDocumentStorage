@@ -32,5 +32,7 @@ namespace SecureDocumentStorage.Data.Entities
 
         [Required]
         public bool Deleted { get; set; }
+        [Required]
+        public bool IsPublic { get; set; }
     }
 }

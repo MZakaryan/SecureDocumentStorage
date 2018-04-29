@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,25 +19,36 @@ namespace SecureDocumentStorage.Controllers
     public class DocumentController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signingManager;
         private readonly ApplicationDbContext _dbContext;
         private readonly IHostingEnvironment _appEnvironment;
 
         public DocumentController(UserManager<ApplicationUser> userManager,
             ApplicationDbContext dbContext,
-            IHostingEnvironment appEnvironment)
+            IHostingEnvironment appEnvironment,
+            SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _dbContext = dbContext;
             _appEnvironment = appEnvironment;
+            _signingManager = signInManager;
         }
-
-        public IActionResult Index()
+        
+        public async Task<IActionResult> Index()
         {
             var docs = _dbContext.Documents
                                  .Include(d => d.User)
-                                 .Where(d => d.Deleted == false)
-                                 .AsEnumerable();
-
+                                 .Where(d => d.Deleted == false);
+            if (!_signingManager.IsSignedIn(User))
+            {
+                docs = docs.Where(d => d.IsPublic == true);
+            }
+            else
+            {
+                ApplicationUser currentUser =
+                await _userManager.GetUserAsync(HttpContext.User);
+                docs = docs.Where(d => d.UserId == currentUser.Id);
+            }
             List<DocumentInfoViewModel> model =
                 new List<DocumentInfoViewModel>();
 
@@ -47,18 +59,21 @@ namespace SecureDocumentStorage.Controllers
                     Id = item.Id,
                     Name = item.Name,
                     UserName = item.User.UserName,
-                    Date = item.Date
+                    Date = item.Date,
+                    IsPublic = item.IsPublic,
                 });
             }
 
             return View(model);
         }
 
+        [Authorize]
         public IActionResult Upload()
         {
             return View();
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> UploadDocument(AddEditDocumentViewModel model)
         {
@@ -99,6 +114,7 @@ namespace SecureDocumentStorage.Controllers
                 ContentType = model.Document.ContentType,
                 Path = documentName,
                 UserId = currentUser.Id,
+                IsPublic = model.IsPublic,
             };
 
             _dbContext.Documents.Add(document);
@@ -127,7 +143,6 @@ namespace SecureDocumentStorage.Controllers
                                 doc.ContentType);
         }
 
-
         private FileResult DownloadFile(string folderPath, 
                                         string filePath, 
                                         string fileName,
@@ -138,5 +153,28 @@ namespace SecureDocumentStorage.Controllers
             var readStream = fileInfo.CreateReadStream();
             return File(readStream, contentType, fileName);
         }
+
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var doc = await _dbContext.Documents
+                                      .Include(d => d.User)
+                                      .Where(d => d.Id == id)
+                                      .SingleAsync();
+            doc.Deleted = true;
+            _dbContext.Entry(doc).State = EntityState.Modified;
+            var path = Path.Combine(
+                           _appEnvironment.WebRootPath,
+                           "files",
+                           "documents",
+                           doc.User.UserName + "_" +
+                           doc.UserId,
+                           doc.Path);
+            System.IO.File.Delete(path);
+            await _dbContext.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

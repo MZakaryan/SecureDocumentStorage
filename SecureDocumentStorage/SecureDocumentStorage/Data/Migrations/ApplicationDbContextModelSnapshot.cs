@@ -140,6 +140,8 @@ namespace SecureDocumentStorage.Data.Migrations
 
                     b.Property<bool>("Deleted");
 
+                    b.Property<bool>("IsPublic");
+
                     b.Property<string>("Name")
                         .IsRequired();
 
