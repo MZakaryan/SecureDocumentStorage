@@ -1,5 +1,5 @@
 ﻿@using SecureDocumentStorage.Models.DocumentViewModels
-@model AddEditDocumentViewModel
+@model IEnumerable<DocumentInfoViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -7,16 +7,40 @@
 
 <h2>Index</h2>
 
-<form method="post" enctype="multipart/form-data" asp-controller="Document" asp-action="UploadDocument">
-    <div class="form-group">
-        <div>
-            <p>Upload document</p>
-            <input type="file" name="document" />
-        </div>
-    </div>
-    <div class="form-group">
-        <div>
-            <button type="submit" class="btn btn-default form-group">Upload</button>
-        </div>
-    </div>
-</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                <a asp-action="Download" asp-route-id="@item.Id">Download</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

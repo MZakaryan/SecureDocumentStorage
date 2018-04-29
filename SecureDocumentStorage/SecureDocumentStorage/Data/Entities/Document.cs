@@ -17,6 +17,9 @@ namespace SecureDocumentStorage.Data.Entities
         public string Name { get; set; }
 
         [Required]
+        public string ContentType { get; set; }
+
+        [Required]
         public DateTime Date { get; set; }
 
         [Required]
@@ -26,5 +29,8 @@ namespace SecureDocumentStorage.Data.Entities
         [ForeignKey(nameof(ApplicationUser))]
         public string UserId { get; set; }
         public virtual ApplicationUser User { get; set; }
+
+        [Required]
+        public bool Deleted { get; set; }
     }
 }
