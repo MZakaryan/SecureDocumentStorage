@@ -29,6 +29,10 @@
                 <a asp-area="" asp-controller="Document" asp-action="Index" class="navbar-brand">SecureDocumentStorage</a>
             </div>
             <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a asp-area="" asp-controller="document" asp-action="Index">List</a></li>
+                    <li><a asp-area="" asp-controller="document" asp-action="upload">Upload File</a></li>
+                </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>
         </div>
