@@ -33,10 +33,8 @@ var cryptoManager = function ()
            alert("Invalid pass phrase or file! Please try again.");
            return false;
         }
-
         $(".downloadFile").attr('href', decrypted);
         $(".downloadFile").attr('download', fileName);
-        $(".downloadFile").trigger("click");
     }
 
     return {

@@ -11,6 +11,10 @@
         cryptoManager.init();
     });
 
+    $(document).on("click", "a", function () {
+        debugger;
+    });
+
     function addDocumentId(documentId) {
         $("#hiddenDocumentId").val(documentId);
     }
@@ -25,6 +29,7 @@
                 success: function (result) {
                     if (result.encryptedDocument != "" && result.fileName != "") {
                         cryptoManager.decryptFile(result.encryptedDocument, result.fileName, $("#aesDocumentKey").val());
+                        $(".downloadFile")[0].click()
                     }
                 }
             });
@@ -94,6 +99,5 @@
 </div>
 
 
-
-<a class="hidden downloadFile"></a>
+<a class="downloadFile"></a>
 <input type="hidden" id="hiddenDocumentId" value="" />
