@@ -24,25 +24,24 @@ var cryptoManager = function ()
         reader.readAsDataURL(file);
     }
 
-    var decryptFile = function (key)
+    var decryptFile = function (encryptedDocument, fileName, key)
     {
-        var reader = new FileReader();
+       var decrypted = CryptoJS.AES.decrypt(encryptedDocument, key).toString(CryptoJS.enc.Latin1);
 
-        reader.onload = function (e) {
+       if (!/^data:/.test(decrypted))
+       {
+           alert("Invalid pass phrase or file! Please try again.");
+           return false;
+        }
 
-            var decrypted = CryptoJS.AES.decrypt(e.target.result, key)
-                .toString(CryptoJS.enc.Latin1);
-
-            if (!/^data:/.test(decrypted))
-            {
-                alert("Invalid pass phrase or file! Please try again.");
-                return false;
-            }
-        };
+        $(".downloadFile").attr('href', decrypted);
+        $(".downloadFile").attr('download', fileName);
+        $(".downloadFile").click();
     }
 
     return {
         init: init,
-        encryptFile: encryptFile
+        encryptFile: encryptFile,
+        decryptFile: decryptFile
     }
 }();

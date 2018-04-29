@@ -3,6 +3,33 @@
 @{
     ViewData["Title"] = "Index";
 }
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/js/crypto/crypto-manager.js"></script>
+<script>
+    $(document).ready(function () {
+        cryptoManager.init();
+    });
+
+    function addDocumentId(documentId) {
+        $("#hiddenDocumentId").val(documentId);
+    }
+
+    function downloadDocument() {
+
+        if ($("#aesDocumentKey").val() != "" && $("#hiddenDocumentId").val() != "") {
+            $.ajax({
+                type: "GET",
+                url: "/Document/Download/",
+                data: { id: $("#hiddenDocumentId").val() },
+                success: function (result) {
+                    if (result.encryptedDocument != "" && result.fileName != "") {
+                        cryptoManager.decryptFile(result.encryptedDocument, result.fileName, $("#aesDocumentKey").val());
+                    }
+                }
+            });
+        }
+    }
+</script>
 
 <h2>Index</h2>
 
@@ -35,10 +62,36 @@
                     @Html.DisplayFor(modelItem => item.UserName)
                 </td>
                 <td>
-                    <a asp-action="Download" asp-route-id="@item.Id">Download</a> |
+                    <a data-toggle="modal" data-target="#downloadDocumentModal" onclick="addDocumentId(@item.Id);">Download</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<!-- Modal -->
+<div id="downloadDocumentModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Please input key..</h4>
+            </div>
+            <input type="text" id="aesDocumentKey" value="" />
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="downloadDocument()" data-dismiss="modal">Download</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<a class="hidden downloadFile"></a>
+<input type="hidden" id="hiddenDocumentId" value="" />
