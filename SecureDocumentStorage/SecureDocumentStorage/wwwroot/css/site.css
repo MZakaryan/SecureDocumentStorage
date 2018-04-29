@@ -53,3 +53,11 @@ font-size: 20px;
         position: relative;
         top: 4px;
     }
+
+.downloadFileCSS {
+    cursor: pointer;
+}
+
+.modal-content input{
+    width: 100%;
+}

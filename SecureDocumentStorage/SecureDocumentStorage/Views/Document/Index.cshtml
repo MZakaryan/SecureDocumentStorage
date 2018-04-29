@@ -62,7 +62,7 @@
                     @Html.DisplayFor(modelItem => item.UserName)
                 </td>
                 <td>
-                    <a data-toggle="modal" data-target="#downloadDocumentModal" onclick="addDocumentId(@item.Id);">Download</a> |
+                    <a class="downloadFileCSS" data-toggle="modal" data-target="#downloadDocumentModal" onclick="addDocumentId(@item.Id);">Download</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                 </td>
             </tr>
@@ -80,7 +80,7 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Please input key..</h4>
             </div>
-            <input type="text" id="aesDocumentKey" value="" />
+            <input type="text" placeholder="Input Key ..." class="form-control" id="aesDocumentKey"/>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" onclick="downloadDocument()" data-dismiss="modal">Download</button>
