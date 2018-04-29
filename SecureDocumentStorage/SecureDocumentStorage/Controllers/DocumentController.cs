@@ -18,19 +18,22 @@ namespace SecureDocumentStorage.Controllers
 {
     public class DocumentController : Controller
     {
+        private readonly SignInManager<ApplicationUser> _signingManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationDbContext _dbContext;
         private readonly IHostingEnvironment _appEnvironment;
 
-        public DocumentController(UserManager<ApplicationUser> userManager,
+        public DocumentController(SignInManager<ApplicationUser> signingManager,
+            UserManager<ApplicationUser> userManager,
             ApplicationDbContext dbContext,
             IHostingEnvironment appEnvironment)
         {
+            _signingManager = signingManager;
             _userManager = userManager;
             _dbContext = dbContext;
             _appEnvironment = appEnvironment;
         }
-        
+
         [Authorize]
         public async Task<IActionResult> Index()
         {
@@ -98,7 +101,7 @@ namespace SecureDocumentStorage.Controllers
             }
 
             string documentName = "document_" +
-                                  Guid.NewGuid() + 
+                                  Guid.NewGuid() +
                                   ".txt";
 
             ApplicationUser currentUser =
@@ -140,36 +143,52 @@ namespace SecureDocumentStorage.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        //public async Task<IActionResult> Download(int id)
-        //{
-        //    var doc = await _dbContext.Documents
-        //                              .Include(d => d.User)
-        //                              .Where(d => d.Id == id)
-        //                              .SingleAsync();
+        public async Task<IActionResult> Download(int id)
+        {
+            var doc = await _dbContext.Documents
+                                .Include(d => d.User)
+                                .Where(d => !d.Deleted)
+                                .Where(d => d.Id == id)
+                                .SingleAsync();
 
-        //    var path = Path.Combine(
-        //                   _appEnvironment.WebRootPath,
-        //                   "files",
-        //                   "documents",
-        //                   doc.User.UserName + "_" +
-        //                   doc.UserId);
-            
-        //    return DownloadFile(path, 
-        //                        doc.Path, 
-        //                        doc.Name, 
-        //                        doc.ContentType);
-        //}
+            if (!doc.IsPublic)
+            {
+                if (_signingManager.IsSignedIn(User))
+                {
+                    ApplicationUser currentUser =
+                    await _userManager.GetUserAsync(HttpContext.User);
+                    if (doc.UserId != currentUser.Id)
+                    {
+                        return RedirectToAction(nameof(PublicDocuments));
+                    }
+                }
+                else
+                {
+                    return RedirectToAction(nameof(PublicDocuments));
+                }
+            }
 
-        //private FileResult DownloadFile(string folderPath, 
-        //                                string filePath, 
-        //                                string fileName,
-        //                                string contentType)
-        //{
-        //    IFileProvider provider = new PhysicalFileProvider(folderPath);
-        //    IFileInfo fileInfo = provider.GetFileInfo(filePath);
-        //    var readStream = fileInfo.CreateReadStream();
-        //    return File(readStream, contentType, fileName);
-        //}
+            var path = Path.Combine(
+                       _appEnvironment.WebRootPath,
+                       "files",
+                       "documents",
+                       doc.User.UserName + "_" +
+                       doc.UserId,
+                       doc.Path);
+
+            string encDoc;
+
+            using (StreamReader reader = new StreamReader(path))
+            {
+                encDoc = await reader.ReadToEndAsync();
+            }
+
+            return Json(new
+            {
+                encryptedDocument = encDoc,
+                fileName = doc.Name
+            });
+        }
 
         [Authorize]
         public async Task<IActionResult> Delete(int id)

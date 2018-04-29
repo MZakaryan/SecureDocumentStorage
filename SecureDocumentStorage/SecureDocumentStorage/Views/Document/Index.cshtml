@@ -5,6 +5,7 @@
 }
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/js/crypto/crypto-manager.js"></script>
+<script src="~/js/crypto/aes.js"></script>
 <script>
     $(document).ready(function () {
         cryptoManager.init();
@@ -80,7 +81,7 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Please input key..</h4>
             </div>
-            <input type="text" placeholder="Input Key ..." class="form-control" id="aesDocumentKey"/>
+            <input type="text" placeholder="Input Key ..." class="form-control" id="aesDocumentKey" />
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" onclick="downloadDocument()" data-dismiss="modal">Download</button>

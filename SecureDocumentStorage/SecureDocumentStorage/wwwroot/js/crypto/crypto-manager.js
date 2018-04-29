@@ -36,7 +36,7 @@ var cryptoManager = function ()
 
         $(".downloadFile").attr('href', decrypted);
         $(".downloadFile").attr('download', fileName);
-        $(".downloadFile").click();
+        $(".downloadFile").trigger("click");
     }
 
     return {
