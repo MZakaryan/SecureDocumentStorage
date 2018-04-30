@@ -25,7 +25,8 @@
                 success: function (result) {
                     if (result.encryptedDocument != "" && result.fileName != "") {
                         cryptoManager.decryptFile(result.encryptedDocument, result.fileName, $("#aesDocumentKey").val());
-                        $(".downloadFile")[0].click()
+                        $(".downloadFile")[0].click();
+                        location.reload();
                     }
                 }
             });

@@ -197,6 +197,15 @@ namespace SecureDocumentStorage.Controllers
                                       .Include(d => d.User)
                                       .Where(d => d.Id == id)
                                       .SingleAsync();
+            if (_signingManager.IsSignedIn(User))
+            {
+                ApplicationUser currentUser =
+                await _userManager.GetUserAsync(HttpContext.User);
+                if (doc.UserId != currentUser.Id)
+                {
+                    return RedirectToAction(nameof(PublicDocuments));
+                }
+            }
             doc.Deleted = true;
             _dbContext.Entry(doc).State = EntityState.Modified;
             var path = Path.Combine(
